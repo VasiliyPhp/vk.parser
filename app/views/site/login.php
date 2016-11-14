@@ -21,8 +21,8 @@ $this->params['breadcrumbs'][] = $this->title;
 			скопируйте адрес в адресной строке и вставьте в это поле. 
 		</p>
 		<div class="form-group">
-       		<?= Html::a('Получить токен', $authorize_url, ['target'=>'new-wind', 'class'=>'btn btn-success']);?> 
-					<?= Html::submitButton('Войти', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
+       		<!--<?= Html::a('Получить токен', $authorize_url, ['target'=>'new-wind', 'class'=>'btn btn-success']);?> -->
+			<?= Html::submitButton('Войти', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
 		</div>
 	</div>
 </div>

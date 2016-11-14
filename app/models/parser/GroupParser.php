@@ -30,22 +30,23 @@ class GroupParser extends Model
 		
 		public static function getRegions($country){
 			$cache = yii::$app->cache;
-			$regions = [];
-			if($regions = $cache->get($country . 'regions')){
-				return $regions;
+			$regions = null;
+			if( !($regions = $cache->get($country . 'regions'))){
+				$regions = [];
+				$token = yii::$app->user->identity->vk_access_token;
+				$VK = new VK(yii::$app->params['vk_standalone_app_id'], yii::$app->params['vk_standalone_secret_key'], $token);
+				$VK->bulkApi('database.getRegions', ['country_id'=>$country,'need_all'=>1,'count'=>1000], $regions);
+				$regions = array_column($regions, 'title', 'id');
+				$cache->set($country . 'regions', $regions, 60*60*24*365);
 			}
-			$regions = [];
-			$token = yii::$app->user->identity->vk_access_token;
-			$VK = new VK(yii::$app->params['vk_standalone_app_id'], yii::$app->params['vk_standalone_secret_key'], $token);
-			$VK->bulkApi('database.getRegions', ['country_id'=>$country,'need_all'=>1,'count'=>1000], $regions);
-			$regions = array_column($regions, 'title', 'id');
-			$cache->set($country . 'regions', $regions, 60*60*24*365);
-			return $regions;
+			return $regions ? compact('regions') : ['city'=>self::getCities($country)];
 		}
 		
 		public static function getCountries(){
 			$cache = yii::$app->cache;
 			$countries = [];
+			/**/
+			// $cache->flush();
 			if($countries = $cache->get('countries')){
 				return $countries;
 			}
@@ -58,9 +59,10 @@ class GroupParser extends Model
 			return $countries;
 		}
 		
-		public function getCities($country, $region = null){
+		public static function getCities($country, $region = null){
 		  $cache = yii::$app->cache;
 			$cities = [];
+			/**/
 			// $cache->flush();
 			if($cities = $cache->get($country . '-' . $region . 'cities')){
 				return $cities;
@@ -72,7 +74,7 @@ class GroupParser extends Model
 			$VK->bulkApi('database.getCities', ['region_id'=>$region, 'country_id'=>$country, 'need_all'=>1,'count'=>1000], $cities);
 			$cities = array_column($cities, 'title', 'id');
 			$cache->set($country . 'cities', $cities, 60*60*24*365);
-			return $cities;
+			return compact('cities');
 		}
 		
     /**

@@ -15,9 +15,9 @@ $this->title = 'Вк парсер';
 ob_start();
 $form = ActiveForm::begin(['action'=>['site/group-parser']]);
 echo $form->field($GroupParser,'queries') ->textarea()
-	. $form->field($GroupParser,'country')->dropDownlist($GroupParser->countries,['id'=>'x-country']) 
-	. $form->field($GroupParser,'region')->dropDownlist([],['id'=>'x-region','disabled'=>true])
-	. $form->field($GroupParser,'city')->dropDownlist([],['id'=>'x-city','disabled'=>true])
+	. $form->field($GroupParser,'country')->dropDownlist($GroupParser->countries,['id'=>'x-country', 'prompt'=>'Выберите страну']) 
+	. $form->field($GroupParser,'region')->dropDownlist([],['id'=>'x-region', 'prompt'=>'Выберите регион','disabled'=>true])
+	. $form->field($GroupParser,'city')->dropDownlist([],['id'=>'x-city', 'prompt'=>'Выберите город','disabled'=>true])
 	. $form->field($GroupParser,'closed')->checkbox()
 	. Html::submitButton('Собрать', ['class'=>'btn btn-success']);
 	$form1 = ob_get_contents();
@@ -48,25 +48,61 @@ ob_end_clean();
 
 <?php 
 $js = "
+var city_cont = $('#x-city');
+var region_cont = $('#x-region');
+var country_cont = $('#x-country');
 $('#x-country').change(function(){
 	var country = this.value;
 	var regions;
-	var city_cont = $('#x-region')
 	var url = '".yii::$app->urlManager->createUrl(['site/get-regions'])."';
-	city_cont.html('');
+	region_cont.attr('disabled', true).html('');
+	city_cont.attr('disabled', true).html('');
 	if(!country){
 		return ;
 	}
-	$.get(url+'?country='+country, function(regions){
-  	var opt = '';
-		for(var i in regions){
-			opt += '<option vaue=\"'+i+'\">'+regions[i]+'</option>';
+	$.get(url+'?country='+country, function(response){
+		var opt = '',
+			src = null,
+			into = null;
+		if(response.regions){
+			src = response.regions;
+			into = region_cont;
+		}else if(response.city){
+			src = response.city;
+			into = city_cont;
+		}
+		for(var i in src){
+			opt += '<option value=\"'+i+'\">'+src[i]+'</option>';
 		};
-		$(opt).appendTo(city_cont);
-	})
+		$(opt).appendTo(into);
+		into.attr('disabled', false);
+	});
 })
+
 $('#x-region').change(function(){
-	var val = this.value;
+	var region = this.value;
+	var country = country_cont[0].value;
+	var cities;
+	var url = '".yii::$app->urlManager->createUrl(['site/get-cities'])."';
+	// region_cont.attr('disabled', true).html('');
+	city_cont.attr('disabled', true).html('');
+	if(!region){
+		return ;
+	}
+	$.get(url+'?region='+region+'&country='+country, function(response){
+		var opt = '',
+			src = null,
+			into = null;
+		if(response.cities){
+			src = response.cities;
+			into = city_cont;
+		}
+		for(var i in src){
+			opt += '<option value=\"'+i+'\">'+src[i]+'</option>';
+		};
+		$(opt).appendTo(into);
+		into.attr('disabled', false);
+	});
 })
 
 

@@ -18,7 +18,7 @@ class LoginForm extends Model
     public function rules()
     {
         return [
-           ['vk_token', 'required'],
+           ['vk_token', 'required', 'message'=>'Обязательно'],
            ['vk_token', 'url'],
         ];
     }

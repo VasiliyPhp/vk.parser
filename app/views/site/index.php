@@ -40,6 +40,15 @@ ob_end_clean();
 			?>
 		</div>
 	</div>
+	<?php if($result){?>
+	<div class='row'>
+		<div class='col-md-4'>
+			<textarea class="form-control">
+			<?= implode("\n", array_column($result, 'name')) ?>
+			</textarea>
+		</div>
+	</div>
+	<?php }?>
 	<?php ActiveForm::end();?>
 </div><!-- site-index -->
 

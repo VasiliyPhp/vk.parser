@@ -16,8 +16,8 @@ class GroupParser extends Model
     public $country;
     public $city;
     public $closed;
-	static $max_queries = 25;
-
+	  static $max_queries = 25;
+		static $is_closed;
     /**
      * @return array the validation rules.
      */
@@ -49,7 +49,7 @@ class GroupParser extends Model
 			$regions = array_column($regions, 'title', 'id');
 			$cache->set($country . 'regions', $regions, 60*60*24*365);
 		}
-		return $regions ? compact('regions') : ['city'=>self::getCities($country)];
+		return $regions ? compact('regions') : ['cities'=>self::getCities($country)['cities'] ];
 	}
 	
 	public static function getCountries(){
@@ -93,7 +93,7 @@ class GroupParser extends Model
     public function attributeLabels()
     {
         return [
-            'queries' => 'Запросы',
+            'queries' => 'Список запросов. Каждый на новой строке',
             'country' => 'Страна',
             'region' => 'Регион',
             'city' => 'Город',

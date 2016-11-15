@@ -34,21 +34,39 @@ class GroupParser extends yii\base\Action{
 			return groups;
 			";
 			$rs = $VK->api('execute', compact('code'));
-			// j($rs);
 			if($GroupParser->closed){
 				$result = array_filter($rs['response'], function($item){
-					return true;$item['is_closed']==1;
+				  return $item['is_closed']==1;
 				});
 			}else{
 				$result = $rs['response'];
 			}
-			$result = $this->getGroupInfo(array_column($result, 'id'), $VK);
-			// $VK->bulkApi('groups.search', $params, $result);
-			j($result);
-			
+			if(count($result)){
+				$result = $this->getGroupInfo(array_column($result, 'id'), $VK);
+				if(isset($result['error'])){
+					throw new \VK\VKException($result['error']['error_msg']);
+				}
+				$result = array_filter($result['response'], function($item){
+					$res = isset($item['site']) && strlen(trim($item['site'])) && isset($item['contacts']) && count($item['contacts']);
+					return $res;
+				});
+				$result = array_map(function($item){
+					$item['id'] ='http://vk.com/club'.$item['id'];// yii\helpers\Html::a('http://vk.com/club'.$item['id'],'http://vk.com/club'.$item['id'], ['title'=>$item['name'], 'target'=>'_blank']);
+					$item['contacts'] = implode('<br>', array_map(function($i){
+						$s = '';
+						$s .= isset($i['desc'])? '(' . $i['desc'] . ') '  : '';
+						$s .= isset($i['user_id'])?  'vk - http://vk.com/id'.$i['user_id']:'';//yii\helpers\Html::a('vk - http://vk.com/id'.$i['user_id'], 'http://vk.com/id'.$i['user_id'], ['target'=>'_blank']) : '';
+						$s .= isset($i['email'])? '; email - ' . $i['email'] : '';
+						$s .= isset($i['phone'])? '; tel - ' . $i['phone'] : '';
+						return $s;
+					}, $item['contacts']));
+					return $item;
+				}, $result);
+			}
 		}
-		
-		return $this->controller->render('index', compact('GroupParser','result'));
+		$PeopleFromGroup = new \app\models\parser\PeopleFromGroupParser;	
+		$PeopleSearch = new \app\models\parser\PeopleFromSearchParser;
+		return $this->controller->render('index', compact('PeopleFromGroup', 'PeopleSearch', 'GroupParser','resultPeopleFromGroup'));
 	}
 	
 	private function getGroupInfo($ids, $vk){
@@ -64,7 +82,7 @@ class GroupParser extends yii\base\Action{
 		// j($js_ids);
 		while($collected < $count){
 			$code = "
-			var lim = 1,
+			var lim = 25,
 				collected = $collected,
 				count = $count,
 				index = $index,
@@ -78,21 +96,22 @@ class GroupParser extends yii\base\Action{
 				var length = ids.length,
 					str_ids = ids[index];
 				
-				// return length;
 				params.group_ids = str_ids;
 				
 				res = res + API.groups.getById(params);
 				collected = collected + $max;
 				index = index + 1;
 			}
-			return [res, index];
+			return res;
 			";
 			$index += 25;
 			$collected += 25*$max;
 			// $res += q
-			x($vk->api('execute', compact('code')));
+			usleep(250000);
+		  $res += ($vk->api('execute', compact('code')));
 		}
-		j($res);
+		// j($res);
+		return $res;
 		
 	}
 	

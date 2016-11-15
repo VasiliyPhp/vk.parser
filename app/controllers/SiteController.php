@@ -66,6 +66,12 @@ class SiteController extends Controller
             'group-parser' => [
                 'class' => '\app\actions\parser\GroupParser',
             ],
+            'people-from-search-parser' => [
+                'class' => '\app\actions\parser\PeopleFromSearchParser',
+            ],
+            'people-from-group-parser' => [
+                'class' => '\app\actions\parser\PeopleFromGroupParser',
+            ],
             'get-cities' => [
                 'class' => '\app\actions\parser\GetCities',
             ],
@@ -80,11 +86,12 @@ class SiteController extends Controller
     }
   
 	public function actionIndex(){
+		$result = null;
 		$GroupParser = new \app\models\parser\GroupParser;
-		// $PeopleFind = new \app\models\parser\PeopleFind;
-		// $PeopleFromGroup = new \app\models\parser\PeopleFromGroup;
+		$PeopleSearch = new \app\models\parser\PeopleFromSearchParser;
+		$PeopleFromGroup = new \app\models\parser\PeopleFromGroupParser;
 		// $PeopleInfo = new \app\models\parser\PeopleInfo;
-		return $this->render('index', compact('GroupParser'/* ,'PeopleFind','PeopleFromGroup','PeopleInfo' */));
+		return $this->render('index', compact('result','PeopleSearch','PeopleFromGroup','GroupParser'/* ,'PeopleInfo' */));
   }
 	
 	public function actionDelete($index){

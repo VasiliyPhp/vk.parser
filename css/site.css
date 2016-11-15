@@ -1,8 +1,8 @@
 html,
 body {
     height: 100%;
-		background: url('../images/fon.jpg') fixed center center;
-		background-size: cover;
+/* 		background: url('../images/fon.jpg') fixed center center; */		
+    background-size: cover;
 }
 
 .wrap {

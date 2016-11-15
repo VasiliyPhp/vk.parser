@@ -11,20 +11,47 @@ $this->title = 'Вк парсер';
 ?>
 <h1><?=$this->title?></h1>
 <div class="site-index">
+  <div class=row>
 <?php 
 ob_start();
 $form = ActiveForm::begin(['action'=>['site/group-parser']]);
 echo $form->field($GroupParser,'queries') ->textarea()
-	. $form->field($GroupParser,'country')->dropDownlist($GroupParser->countries,['id'=>'x-country', 'prompt'=>'Выберите страну']) 
-	. $form->field($GroupParser,'region')->dropDownlist([],['id'=>'x-region', 'prompt'=>'Выберите регион','disabled'=>true])
-	. $form->field($GroupParser,'city')->dropDownlist([],['id'=>'x-city', 'prompt'=>'Выберите город','disabled'=>true])
+	. $form->field($GroupParser,'country')->dropDownlist($GroupParser->countries,['data-x-country'=>1, 'prompt'=>'Выберите страну']) 
+	. $form->field($GroupParser,'region')->dropDownlist([],['data-x-region'=>1, 'prompt'=>'','disabled'=>true])
+	. $form->field($GroupParser,'city')->dropDownlist([],['data-x-city'=>1, 'prompt'=>'','disabled'=>true])
 	. $form->field($GroupParser,'closed')->checkbox()
-	. Html::submitButton('Собрать', ['class'=>'btn btn-success']);
-	$form1 = ob_get_contents();
+	. '<div class=form-group >' . Html::submitButton('Собрать', ['class'=>'btn btn-success']) . '</div>';
+
+	 ActiveForm::end();
+	 $form1 = ob_get_contents();
+ob_end_clean();
+ob_start();
+$form = ActiveForm::begin(['action'=>['site/people-from-group-parser']]);
+echo $form->field($PeopleFromGroup,'groups') ->textarea()
+		. $form->field($PeopleFromGroup,'open_mess')->checkbox()
+		. $form->field($PeopleFromGroup,'open_wall')->checkbox()
+  	. '<div class=form-group >' . Html::submitButton('Собрать', ['class'=>'btn btn-success']) . '</div>';
+  ActiveForm::end();
+	$form2 = ob_get_contents();
+ob_end_clean();
+ob_start();
+$form = ActiveForm::begin(['action'=>['site/people-from-search-parser']]);
+echo $form->field($PeopleSearch,'queries') ->textarea()
+	. $form->field($PeopleSearch,'country')->dropDownlist(\app\models\parser\GroupParser::getCountries(),['data-x-country'=>1, 'prompt'=>'Выберите страну']) 
+	. $form->field($PeopleSearch,'region')->dropDownlist([],['data-x-region'=>1, 'prompt'=>'','disabled'=>true])
+	. $form->field($PeopleSearch,'city')->dropDownlist([],['data-x-city'=>1, 'prompt'=>'','disabled'=>true])
+	. $form->field($PeopleSearch,'age_from')->textInput(['type'=>'number'])
+	. $form->field($PeopleSearch,'age_to')->textInput(['type'=>'number'])
+	. $form->field($PeopleSearch,'sex')->dropDownlist(['0'=>'Любой','1'=>'Мужской','2'=>'Женский'])
+	. $form->field($PeopleSearch,'open_mess')->checkbox()
+	. $form->field($PeopleSearch,'open_wall')->checkbox()
+  . '<div class=form-group >' . Html::submitButton('Собрать', ['class'=>'btn btn-success']) . '</div>';
+
+	 ActiveForm::end();
+	 $form3 = ob_get_contents();
 ob_end_clean();
 ?>
-  <div class=row>
-  	<div class="col-md-4">
+  	<div class="col-md-6">
 			<?=  Tabs::widget([
 				  'items'=>[
 					  [
@@ -32,38 +59,74 @@ ob_end_clean();
 							'content'=>$form1,		
 						],
 					  [
-						  'label'=>'Поиск групп',
-							'content'=>'привет',
+						  'label'=>'Поиск людей из групп',
+							'content'=>$form2,
+						],
+					  [
+						  'label'=>'Люди из поиска ВКонтакте',
+							'content'=>$form3,
 						],
 					]
 				]);
 			?>
 		</div>
 	</div>
-	<?php if($result){?>
-	<div class='row'>
-		<div class='col-md-4'>
-			<textarea class="form-control">
-			<?= implode("\n", array_column($result, 'name')) ?>
-			</textarea>
+	<?php if(isset($result) and $result){?>
+  <div class=form-group >
+    <button class='btn btn-primary x-gr-cp'>Скопировать группы</button>
+	</div>	
+	<div class="row">
+		<div class=col-md-12 >
+			<table class="x-gr-res table" >
+				<?php foreach($result as $res){?>
+				<tr>
+					<td><?=$res['id']?></td><td><?=$res['contacts']?></td>
+				</tr>
+				<?php } ?> 
+			</table>
 		</div>
 	</div>
 	<?php }?>
-	<?php ActiveForm::end();?>
+	<?php if(isset($resultPeopleFromGroup) and $resultPeopleFromGroup){?>
+  <div class=form-group >
+    <button class='btn btn-primary x-gr-cp'>Скопировать людей</button>
+	</div>	
+	<div class="row">
+		<div class=col-md-12 >
+			<table class="x-gr-res table" >
+				<?php foreach($resultPeopleFromGroup as $res){?>
+				<tr>
+					<td><?=$res['id']?></td>
+				</tr>
+				<?php } ?> 
+			</table>
+		</div>
+	</div>
+	<?php }?>
 </div><!-- site-index -->
 
 
 
 
 <?php 
+$css = ".fix-height>div{
+	height: 40px;
+	overflow:auto;
+	padding:4px;
+}
+.fix-height>div:nth-of-type(even){
+	background:#e9e9ea;
+}";
+$this->registerCss($css);
 $js = "
-var city_cont = $('#x-city');
-var region_cont = $('#x-region');
-var country_cont = $('#x-country');
-$('#x-country').change(function(){
+var city_cont = $('[data-x-city]');
+var region_cont = $('[data-x-region]');
+var country_cont = $('[data-x-country]');
+country_cont.change(function(){
 	var country = this.value;
 	var regions;
 	var url = '".yii::$app->urlManager->createUrl(['site/get-regions'])."';
+	country_cont.val(country);
 	region_cont.attr('disabled', true).html('');
 	city_cont.attr('disabled', true).html('');
 	if(!country){
@@ -76,8 +139,8 @@ $('#x-country').change(function(){
 		if(response.regions){
 			src = response.regions;
 			into = region_cont;
-		}else if(response.city){
-			src = response.city;
+		}else if(response.cities){
+			src = response.cities;
 			into = city_cont;
 		}
 		for(var i in src){
@@ -88,7 +151,7 @@ $('#x-country').change(function(){
 	});
 })
 
-$('#x-region').change(function(){
+region_cont.change(function(){
 	var region = this.value;
 	var country = country_cont[0].value;
 	var cities;
@@ -112,8 +175,18 @@ $('#x-region').change(function(){
 		$(opt).appendTo(into);
 		into.attr('disabled', false);
 	});
+	
 })
-
+$('.x-gr-cp').click(function(ev){
+	var copied = $('.x-gr-res');
+	ev.preventDefault();
+	ev.stopPropagation();
+	copied.attr('contentEditable',true).focus();
+	document.execCommand('SelectAll');
+	document.execCommand('Copy');
+	copied.attr('contentEditable',false)
+	
+});
 
 ";
 $this->registerJs($js, yii\web\view::POS_READY);

@@ -16,7 +16,7 @@ class GroupParser extends yii\base\Action{
 			$params = json_encode([
 			  'city_id'=>$GroupParser->city,
 			  'country_id'=>$GroupParser->country,
-			  'count'=>500
+			  'count'=>600
 			]);
 			$result = [];
 			$queries = json_encode(array_filter(explode("\n", $GroupParser->queries)), JSON_UNESCAPED_UNICODE );
@@ -66,11 +66,10 @@ class GroupParser extends yii\base\Action{
 		}
 		$PeopleFromGroup = new \app\models\parser\PeopleFromGroupParser;	
 		$PeopleSearch = new \app\models\parser\PeopleFromSearchParser;
-		return $this->controller->render('index', compact('PeopleFromGroup', 'PeopleSearch', 'GroupParser','resultPeopleFromGroup'));
+		return $this->controller->render('index', compact('result','PeopleFromGroup', 'PeopleSearch', 'GroupParser','resultPeopleFromGroup'));
 	}
 	
 	private function getGroupInfo($ids, $vk){
-		
 		$max = 500;
 		$count = count($ids);
 		$collected = 0;
@@ -78,9 +77,12 @@ class GroupParser extends yii\base\Action{
 		$index = 0;
 		// x([$collected, $count]);
 		// $js_ids = json_encode($ids);
-		$js_ids = json_encode(array_map(function($item){return implode(',',$item);},array_chunk($ids, 500)));
-		// j($js_ids);
+		// $js_ids = json_encode(array_map(function($item){return implode(',',$item);},array_chunk($ids, 500)));
+		$js_ids = json_encode($ids);
+		// $js_ids = json_encode(range(500,1200));
+		// j($ids);
 		while($collected < $count){
+			
 			$code = "
 			var lim = 25,
 				collected = $collected,
@@ -94,10 +96,10 @@ class GroupParser extends yii\base\Action{
 			while(count > collected && lim > 0){
 				lim = lim - 1;
 				var length = ids.length,
-					str_ids = ids[index];
-				
-				params.group_ids = str_ids;
-				
+					ar = ids.slice(collected);
+				// return ar;
+				params.group_ids = ar;
+				// res = res + [collected, $max];
 				res = res + API.groups.getById(params);
 				collected = collected + $max;
 				index = index + 1;
@@ -107,8 +109,8 @@ class GroupParser extends yii\base\Action{
 			$index += 25;
 			$collected += 25*$max;
 			// $res += q
-			usleep(250000);
-		  $res += ($vk->api('execute', compact('code')));
+			usleep(200000);
+			$res = array_merge($res, $vk->api('execute', compact('code')));
 		}
 		// j($res);
 		return $res;

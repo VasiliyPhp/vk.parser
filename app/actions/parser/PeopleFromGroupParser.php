@@ -9,17 +9,17 @@ class PeopleFromGroupParser extends yii\base\Action{
 	public function run(){
 		$PeopleParser = new \app\models\parser\PeopleFromGroupParser();
 		$PeopleParser->load(yii::$app->request->post());
-		$resultPeopleFromGroup = null;
+		$resultPeopleFrom = null;
 		if($PeopleParser->validate()){
 			$token = yii::$app->user->identity->vk_access_token;
 			$VK = new VK(yii::$app->params['vk_standalone_app_id'], yii::$app->params['vk_standalone_secret_key'], $token);
-			$resultPeopleFromGroup = $this->getPeoples($PeopleParser, $VK);
+			$resultPeopleFrom = $this->getPeoples($PeopleParser, $VK);
 		}
-		// j($resultPeopleFromGroup);
+		// j($resultPeopleFrom);
 		$PeopleFromGroup = new \app\models\parser\PeopleFromGroupParser;	
 		$GroupParser = new \app\models\parser\GroupParser;	
 		$PeopleSearch = new \app\models\parser\PeopleFromSearchParser;
-		return $this->controller->render('index', compact('PeopleFromGroup', 'PeopleSearch', 'GroupParser','resultPeopleFromGroup'));
+		return $this->controller->render('index', compact('PeopleFromGroup', 'PeopleSearch', 'GroupParser','resultPeopleFrom'));
 	}
 	
 	private function getPeoples($PeopleParser, $vk){

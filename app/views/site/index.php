@@ -87,14 +87,14 @@ ob_end_clean();
 		</div>
 	</div>
 	<?php }?>
-	<?php if(isset($resultPeopleFromGroup) and $resultPeopleFromGroup){?>
-  <div class=form-group >
-    <button class='btn btn-primary x-gr-cp'>Скопировать людей</button>
+	<?php if(isset($resultPeopleFrom) and $resultPeopleFrom){?>
+	<div class=form-group >
+		<button class='btn btn-primary x-gr-cp'>Скопировать людей</button>
 	</div>	
 	<div class="row">
 		<div class=col-md-12 >
 			<table class="x-gr-res table" >
-				<?php foreach($resultPeopleFromGroup as $res){?>
+				<?php foreach($resultPeopleFrom as $res){?>
 				<tr>
 					<td><?=$res['id']?></td>
 				</tr>

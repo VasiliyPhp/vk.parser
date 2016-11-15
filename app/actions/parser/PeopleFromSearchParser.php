@@ -39,7 +39,7 @@ class PeopleFromSearchParser extends yii\base\Action{
 			];
 			$tmp = [];
 			$vk->bulkApi('users.search', $params, $tmp);
-			j($tmp);
+			// j($tmp);
 			$tmp = array_map(function($i){
 				unset($i['first_name'],$i['last_name']);
 				$i['id'] = 'http://vk.com/id' . $i['id'];

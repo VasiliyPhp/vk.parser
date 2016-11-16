@@ -18,12 +18,12 @@ class PeopleInfoParser extends yii\base\Action{
 			if(isset($rs['error'])){
 				throw new \VK\VKException($rs['error']['error_msg']);
 			}
-			$resultPeopleInfo = $rs['response'];
+			$resultPeopleInfo = $rs;
 			$resultPeopleInfo = array_map(function($i){
 				$i['bdate'] = isset($i['bdate'])?$i['bdate']:'';
 				$i['id'] = 'http://vk.com/id' . $i['id'];
 				$i['open_mess'] = $i['can_write_private_message']? 'откр личка':'закр личка';
-				$i['last_seen'] = date('d.m.Y H:i', $i['last_seen']['time']);
+				$i['last_seen'] = isset($i['last_seen'])? date('d.m.Y H:i', $i['last_seen']['time']) : '';
 				$i['country'] = isset($i['country'])?$i['country']['title']:'';
 				$i['city'] = isset($i['city'])?$i['city']['title']:'';
 				$i['sex'] = str_replace([0,1,2],['','женский','мужской'],$i['sex']);
@@ -37,8 +37,10 @@ class PeopleInfoParser extends yii\base\Action{
 				}
 				return $i;
 			}, $resultPeopleInfo);
+		}else{
+			throw new \yii\base\UserException($PeopleInfo->getFirstError('peoples'));
 		}
-		// j($resultPeopleInfo);
+		 // j($PeopleInfo);
 		$PeopleFromGroup = new \app\models\parser\PeopleFromGroupParser;	
 		$GroupParser = new \app\models\parser\GroupParser;	
 		$PeopleSearch = new \app\models\parser\PeopleFromSearchParser;
@@ -47,7 +49,9 @@ class PeopleInfoParser extends yii\base\Action{
 	
 	private function getInfo($PeopleInfo, $vk){
 		$max = 1000;
+		$bit = 2000;
 		$ids = array_filter(array_map(function($item){
+			$item = trim($item);
 			if(preg_match('~vk\.com/id(\d+)/?$~',$item,$tmp)){
 				$item = $tmp[1];
 			}elseif(preg_match('~vk\.com/(.+)/?$~',$item,$tmp)){
@@ -59,14 +63,17 @@ class PeopleInfoParser extends yii\base\Action{
 		}, explode("\n", $PeopleInfo->peoples)));
 		$collected = 0;
 		$res = [];
-		// $ids = range(1,3000);
 		$count = count($ids);
-		$js_ids = json_encode($ids);
+		// $ids = range(1,3000);
 		while($collected < $count){
+			$ids_slice = array_slice($ids, $collected, $bit);
+  		$js_count = count($ids_slice);
+  		// x($ids_slice);
+			$js_ids = json_encode($ids_slice);
 			$code = "
 			var lim = 25,
-				collected = $collected,
-				count = $count,
+				collected = 0,
+				count = $js_count,
 				res = [],
 				ids = $js_ids,
 				params = {
@@ -76,6 +83,7 @@ class PeopleInfoParser extends yii\base\Action{
 				lim = lim - 1;
 				var length = ids.length,
 					ar = ids.slice(collected, collected + $max);
+					 // ar = [collected,collected + $max];
 				params.user_ids = ar;
 				// res = res + ar;
 				res = res + API.users.get(params);
@@ -83,9 +91,11 @@ class PeopleInfoParser extends yii\base\Action{
 			}
 			return res;
 			";
-			$collected += 25*$max;
+		  // $code = "return $js_ids;";
+			$collected += count($ids_slice);
+// x($vk->api('execute', compact('code')));
 			usleep(200000);
-			$res = array_merge($res, (array)$vk->api('execute', compact('code')));
+			$res = array_merge($res, (array)$vk->api('execute', compact('code'))['response']);
 		}
 		// j($res);
 		return $res;

@@ -27,7 +27,7 @@ class PeopleFromGroupParser extends yii\base\Action{
 	private function getPeoples($PeopleParser, $vk){
 		
 		$result = [];
-		$groups = array_filter(explode("\n", $PeopleParser->groups));
+		$groups = array_map('trim', array_filter(explode("\n", $PeopleParser->groups)));
 		foreach($groups as $g){
 			if(preg_match('~vk\.com/club(\d+)/?$~',$g,$tmp)){
 				$g = $tmp[1];

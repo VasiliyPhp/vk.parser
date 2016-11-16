@@ -19,4 +19,6 @@ function j($m){
 }
 function x($m){
 	printf('<pre>%s</pre>',print_r($m,1));
+	flush();
+	ob_flush();
 }

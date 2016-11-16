@@ -7,6 +7,7 @@ use VK\VK;
 class GroupParser extends yii\base\Action{
 	
 	public function run(){
+		session_write_close();
 		$GroupParser = new \app\models\parser\GroupParser();
 		$GroupParser->load(yii::$app->request->post());
 		$result = null;

@@ -7,6 +7,7 @@ use VK\VK;
 class PeopleFromSearchParser extends yii\base\Action{
 	
 	public function run(){
+		session_write_close();
 		$PeopleSearch = new \app\models\parser\PeopleFromSearchParser;
 		$PeopleSearch->load(yii::$app->request->post());
 		$resultPeopleFrom = null;

@@ -7,6 +7,7 @@ use VK\VK;
 class PeopleInfoParser extends yii\base\Action{
 	
 	public function run(){
+		session_write_close();
 		$PeopleInfo = new \app\models\parser\PeopleInfoParser;
 		$PeopleInfo->load(yii::$app->request->post());
 		$resultPeopleInfo = null;

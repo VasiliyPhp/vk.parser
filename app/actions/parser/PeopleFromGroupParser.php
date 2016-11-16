@@ -7,6 +7,7 @@ use VK\VK;
 class PeopleFromGroupParser extends yii\base\Action{
 	
 	public function run(){
+		session_write_close();
 		$PeopleParser = new \app\models\parser\PeopleFromGroupParser();
 		$PeopleParser->load(yii::$app->request->post());
 		$resultPeopleFrom = null;

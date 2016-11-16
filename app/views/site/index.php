@@ -115,7 +115,7 @@ ob_end_clean();
 			</table>
 		</div>
 	</div>
-	<?php }?> 
+	<?php }?>  
 	<?php if(isset($resultPeopleInfo) and $resultPeopleInfo){?>
 	<div class="form-group lead">
     <p><span class="label label-primary"><?= count($resultPeopleInfo) . '  найдено'?></span></p>

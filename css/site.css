@@ -102,7 +102,9 @@ a.desc:after {
 .alert-error{
 	background:#c88;
 }
-
+a:focus{
+	outline:none !important;
+}
 /* for multy vk only */
 
 

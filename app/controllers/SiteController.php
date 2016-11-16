@@ -63,6 +63,9 @@ class SiteController extends Controller
             'error' => [
                 'class' => 'yii\web\ErrorAction',
             ],
+            'people-info-parser' => [
+                'class' => '\app\actions\parser\PeopleInfoParser',
+            ],
             'group-parser' => [
                 'class' => '\app\actions\parser\GroupParser',
             ],
@@ -90,8 +93,8 @@ class SiteController extends Controller
 		$GroupParser = new \app\models\parser\GroupParser;
 		$PeopleSearch = new \app\models\parser\PeopleFromSearchParser;
 		$PeopleFromGroup = new \app\models\parser\PeopleFromGroupParser;
-		// $PeopleInfo = new \app\models\parser\PeopleInfo;
-		return $this->render('index', compact('result','PeopleSearch','PeopleFromGroup','GroupParser'/* ,'PeopleInfo' */));
+		$PeopleInfo = new \app\models\parser\PeopleInfoParser;
+		return $this->render('index', compact('result','PeopleSearch','PeopleFromGroup','GroupParser','PeopleInfo'));
   }
 	
 	public function actionDelete($index){

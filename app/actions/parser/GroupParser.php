@@ -66,7 +66,8 @@ class GroupParser extends yii\base\Action{
 		}
 		$PeopleFromGroup = new \app\models\parser\PeopleFromGroupParser;	
 		$PeopleSearch = new \app\models\parser\PeopleFromSearchParser;
-		return $this->controller->render('index', compact('result','PeopleFromGroup', 'PeopleSearch', 'GroupParser','resultPeopleFromGroup'));
+		$PeopleInfo = new \app\models\parser\PeopleInfoParser;
+		return $this->controller->render('index', compact('result','PeopleFromGroup', 'PeopleInfo', 'PeopleSearch', 'GroupParser','resultPeopleFromGroup'));
 	}
 	
 	private function getGroupInfo($ids, $vk){
@@ -75,19 +76,12 @@ class GroupParser extends yii\base\Action{
 		$collected = 0;
 		$res = [];
 		$index = 0;
-		// x([$collected, $count]);
-		// $js_ids = json_encode($ids);
-		// $js_ids = json_encode(array_map(function($item){return implode(',',$item);},array_chunk($ids, 500)));
 		$js_ids = json_encode($ids);
-		// $js_ids = json_encode(range(500,1200));
-		// j($ids);
 		while($collected < $count){
-			
 			$code = "
 			var lim = 25,
 				collected = $collected,
 				count = $count,
-				index = $index,
 				res = [],
 				ids = $js_ids,
 				params = {
@@ -96,23 +90,18 @@ class GroupParser extends yii\base\Action{
 			while(count > collected && lim > 0){
 				lim = lim - 1;
 				var length = ids.length,
-					ar = ids.slice(collected);
-				// return ar;
+					ar = ids.slice(collected, collected + $max);
 				params.group_ids = ar;
-				// res = res + [collected, $max];
 				res = res + API.groups.getById(params);
 				collected = collected + $max;
-				index = index + 1;
 			}
 			return res;
 			";
 			$index += 25;
 			$collected += 25*$max;
-			// $res += q
 			usleep(200000);
 			$res = array_merge($res, $vk->api('execute', compact('code')));
 		}
-		// j($res);
 		return $res;
 		
 	}

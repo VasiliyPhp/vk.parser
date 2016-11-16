@@ -19,7 +19,8 @@ class PeopleFromGroupParser extends yii\base\Action{
 		$PeopleFromGroup = new \app\models\parser\PeopleFromGroupParser;	
 		$GroupParser = new \app\models\parser\GroupParser;	
 		$PeopleSearch = new \app\models\parser\PeopleFromSearchParser;
-		return $this->controller->render('index', compact('PeopleFromGroup', 'PeopleSearch', 'GroupParser','resultPeopleFrom'));
+		$PeopleInfo = new \app\models\parser\PeopleInfoParser;
+		return $this->controller->render('index', compact('PeopleFromGroup', 'PeopleInfo', 'PeopleSearch', 'GroupParser','resultPeopleFrom'));
 	}
 	
 	private function getPeoples($PeopleParser, $vk){

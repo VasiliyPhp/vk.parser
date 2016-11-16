@@ -42,7 +42,7 @@ echo $form->field($PeopleSearch,'queries') ->textarea()
 	. $form->field($PeopleSearch,'city')->dropDownlist([],['data-x-city'=>1, 'prompt'=>'','disabled'=>true])
 	. $form->field($PeopleSearch,'age_from')->textInput(['type'=>'number'])
 	. $form->field($PeopleSearch,'age_to')->textInput(['type'=>'number'])
-	. $form->field($PeopleSearch,'sex')->dropDownlist(['0'=>'Любой','1'=>'Мужской','2'=>'Женский'])
+	. $form->field($PeopleSearch,'sex')->dropDownlist(['0'=>'Любой','2'=>'Мужской','1'=>'Женский'])
 	. $form->field($PeopleSearch,'open_mess')->checkbox()
 	. $form->field($PeopleSearch,'open_wall')->checkbox()
   . '<div class=form-group >' . Html::submitButton('Собрать', ['class'=>'btn btn-success']) . '</div>';
@@ -50,8 +50,15 @@ echo $form->field($PeopleSearch,'queries') ->textarea()
 	 ActiveForm::end();
 	 $form3 = ob_get_contents();
 ob_end_clean();
+ob_start();
+$form = ActiveForm::begin(['action'=>['site/people-info-parser']]);
+echo $form->field($PeopleInfo,'peoples')->textarea()
+	. '<div class=form-group >' . Html::submitButton('Собрать', ['class'=>'btn btn-success']) . '</div>';
+	 ActiveForm::end();
+	 $form4 = ob_get_contents();
+ob_end_clean();
 ?>
-  	<div class="col-md-6">
+  	<div class="col-lg-8 col-md-10">
 			<?=  Tabs::widget([
 				  'items'=>[
 					  [
@@ -63,8 +70,12 @@ ob_end_clean();
 							'content'=>$form2,
 						],
 					  [
-						  'label'=>'Люди из поиска ВКонтакте',
+						  'label'=>'Люди из поиска ВК',
 							'content'=>$form3,
+						],
+					  [
+						  'label'=>'Информация о людях ВК',
+							'content'=>$form4,
 						],
 					]
 				]);
@@ -73,10 +84,12 @@ ob_end_clean();
 	</div>
 	<?php if(isset($result) and $result){?>
   <div class=form-group >
+    <p><span class="label label-primary"><?= count($result) . '  найдено'?></span></p>
     <button class='btn btn-primary x-gr-cp'>Скопировать группы</button>
 	</div>	
 	<div class="row">
 		<div class=col-md-12 >
+    <span class="label label-primary"><?= count($result) . '  найдено'?></span>
 			<table class="x-gr-res table" >
 				<?php foreach($result as $res){?>
 				<tr>
@@ -89,6 +102,7 @@ ob_end_clean();
 	<?php }?>
 	<?php if(isset($resultPeopleFrom) and $resultPeopleFrom){?>
 	<div class=form-group >
+    <p><span class="label label-primary"><?= count($resultPeopleFrom) . '  найдено'?></span></p>
 		<button class='btn btn-primary x-gr-cp'>Скопировать людей</button>
 	</div>	
 	<div class="row">
@@ -97,6 +111,33 @@ ob_end_clean();
 				<?php foreach($resultPeopleFrom as $res){?>
 				<tr>
 					<td><?=$res['id']?></td>
+				</tr>
+				<?php } ?> 
+			</table>
+		</div>
+	</div>
+	<?php }?>
+	<?php if(isset($resultPeopleInfo) and $resultPeopleInfo){?>
+	<div class=form-group >
+    <p><span class="label label-primary"><?= count($resultPeopleInfo) . '  найдено'?></span></p>
+		<button class='btn btn-primary x-gr-cp'>Скопировать</button>
+	</div>	
+	<div class="row">
+		<div class=col-md-12 >
+			<table class="x-gr-res table" >
+				<?php foreach($resultPeopleInfo as $res){?>
+				<tr>
+					<td><?=$res['id']?></td>
+					<td><?=$res['first_name']?></td>
+					<td><?=$res['last_name']?></td>
+					<td><?=$res['sex']?></td>
+					<td><?=$res['bdate']?></td>
+					<td><?=$res['country']?></td>
+					<td><?=$res['city']?></td>
+					<td><?=$res['open_mess']?></td>
+					<td><?=$res['last_seen']?></td>
+					<td><?=$res['child']?></td>
+					<td><?=$res['relation']?></td>
 				</tr>
 				<?php } ?> 
 			</table>

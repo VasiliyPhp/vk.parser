@@ -85,7 +85,7 @@ class PeopleInfoParser extends yii\base\Action{
 			";
 			$collected += 25*$max;
 			usleep(200000);
-			$res = array_merge($res, $vk->api('execute', compact('code')));
+			$res = array_merge($res, (array)$vk->api('execute', compact('code')));
 		}
 		// j($res);
 		return $res;

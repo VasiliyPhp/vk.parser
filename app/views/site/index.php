@@ -89,7 +89,6 @@ ob_end_clean();
 	</div>	
 	<div class="row">
 		<div class=col-md-12 >
-    <span class="label label-primary"><?= count($result) . '  найдено'?></span>
 			<table class="x-gr-res table" >
 				<?php foreach($result as $res){?>
 				<tr>

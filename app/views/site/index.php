@@ -83,7 +83,7 @@ ob_end_clean();
 		</div>
 	</div>
 	<?php if(isset($result) and $result){?>
-  <div class=form-group >
+	<div class="form-group lead">
     <p><span class="label label-primary"><?= count($result) . '  найдено'?></span></p>
     <button class='btn btn-primary x-gr-cp'>Скопировать группы</button>
 	</div>	
@@ -100,7 +100,7 @@ ob_end_clean();
 	</div>
 	<?php }?>
 	<?php if(isset($resultPeopleFrom) and $resultPeopleFrom){?>
-	<div class=form-group >
+	<div class="form-group lead">
     <p><span class="label label-primary"><?= count($resultPeopleFrom) . '  найдено'?></span></p>
 		<button class='btn btn-primary x-gr-cp'>Скопировать людей</button>
 	</div>	
@@ -117,7 +117,7 @@ ob_end_clean();
 	</div>
 	<?php }?>
 	<?php if(isset($resultPeopleInfo) and $resultPeopleInfo){?>
-	<div class=form-group >
+	<div class="form-group lead">
     <p><span class="label label-primary"><?= count($resultPeopleInfo) . '  найдено'?></span></p>
 		<button class='btn btn-primary x-gr-cp'>Скопировать</button>
 	</div>	

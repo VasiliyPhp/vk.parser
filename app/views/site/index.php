@@ -145,9 +145,6 @@ ob_end_clean();
 	<?php }?>
 </div><!-- site-index -->
 
-
-
-
 <?php 
 $css = ".fix-height>div{
 	height: 40px;
@@ -218,13 +215,13 @@ region_cont.change(function(){
 	
 })
 $('.x-gr-cp').click(function(ev){
-	var copied = $('.x-gr-res');
+	var copied = $('.x-gr-res tbody');
 	ev.preventDefault();
 	ev.stopPropagation();
 	copied.attr('contentEditable',true).focus();
 	document.execCommand('SelectAll');
 	document.execCommand('Copy');
-	copied.attr('contentEditable',false)
+	// copied.attr('contentEditable',false)
 	
 });
 

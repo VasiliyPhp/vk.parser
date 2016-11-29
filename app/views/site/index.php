@@ -37,7 +37,8 @@ ob_end_clean();
 ob_start();
 $form = ActiveForm::begin(['action'=>['site/people-from-search-parser']]);
 echo $form->field($PeopleSearch,'queries') ->textarea()
-	. $form->field($PeopleSearch,'country')->dropDownlist(\app\models\parser\GroupParser::getCountries(),['data-x-country'=>1, 'prompt'=>'Выберите страну']) 
+	. $form->field($PeopleSearch,'country')->dropDownlist(\app\models\parser\GroupParser::getCountries(),
+	  ['data-live-search'=>"true", 'class'=>'selectpicker','data-x-country'=>1, 'prompt'=>'Выберите страну']) 
 	. $form->field($PeopleSearch,'region')->dropDownlist([],['data-x-region'=>1, 'prompt'=>'','disabled'=>true])
 	. $form->field($PeopleSearch,'city')->dropDownlist([],['data-x-city'=>1, 'prompt'=>'','disabled'=>true])
 	. $form->field($PeopleSearch,'age_from')->textInput(['type'=>'number'])

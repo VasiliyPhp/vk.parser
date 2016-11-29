@@ -47,13 +47,13 @@ class GroupParser extends yii\base\Action{
 				if(isset($result['error'])){
 					throw new \VK\VKException($result['error']['error_msg']);
 				}
-				$result = array_filter($result['response'], function($item){
+				$result = array_filter((array)$result, function($item){
 					$res = isset($item['site']) && strlen(trim($item['site'])) && isset($item['contacts']) && count($item['contacts']);
 					return $res;
 				});
 				$result = array_map(function($item){
 					$item['id'] ='http://vk.com/club'.$item['id'];// yii\helpers\Html::a('http://vk.com/club'.$item['id'],'http://vk.com/club'.$item['id'], ['title'=>$item['name'], 'target'=>'_blank']);
-					$item['contacts'] = implode('<br>', array_map(function($i){
+					$item['contacts'] = implode('. ', array_map(function($i){
 						$s = '';
 						$s .= isset($i['desc'])? '(' . $i['desc'] . ') '  : '';
 						$s .= isset($i['user_id'])?  'vk - http://vk.com/id'.$i['user_id']:'';//yii\helpers\Html::a('vk - http://vk.com/id'.$i['user_id'], 'http://vk.com/id'.$i['user_id'], ['target'=>'_blank']) : '';
@@ -73,16 +73,19 @@ class GroupParser extends yii\base\Action{
 	
 	private function getGroupInfo($ids, $vk){
 		$max = 500;
+		$bit = 2000;
 		$count = count($ids);
 		$collected = 0;
 		$res = [];
 		$index = 0;
-		$js_ids = json_encode($ids);
 		while($collected < $count){
+			$ids_slice = array_slice($ids, $collected, $bit);
+			$js_count = count($ids_slice);
+			$js_ids = json_encode($ids_slice);
 			$code = "
 			var lim = 25,
-				collected = $collected,
-				count = $count,
+				collected = 0,
+				count = $js_count,
 				res = [],
 				ids = $js_ids,
 				params = {
@@ -99,10 +102,14 @@ class GroupParser extends yii\base\Action{
 			return res;
 			";
 			$index += 25;
-			$collected += 25*$max;
-			usleep(200000);
-			$res = array_merge($res, $vk->api('execute', compact('code')));
+			$collected += count($ids_slice);
+			// j($vk->api('execute', compact('code')));
+			usleep(180000);
+			$tmp = (array)$vk->api('execute', compact('code'))['response'];
+			// x($tmp);
+			$res = array_merge($res, $tmp);
 		}
+			// j(count($res));
 		return $res;
 		
 	}

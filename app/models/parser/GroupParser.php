@@ -82,8 +82,17 @@ class GroupParser extends Model
 		$VK = new VK(yii::$app->params['vk_standalone_app_id'], yii::$app->params['vk_standalone_secret_key'], $token);
 		
 		$VK->bulkApi('database.getCities', ['region_id'=>$region, 'country_id'=>$country, 'need_all'=>1,'count'=>1000], $cities);
-		$cities = array_column($cities, 'title', 'id');
-		$cache->set($country . 'cities', $cities, 60*60*24*365);
+		$_cities= [];
+		for($i = 0; $i < count($cities); $i++){
+			$city = &$cities[$i];
+			$_cities[$city['id']] = $city['title'] .(isset($city['area'])?   ' (' . $city['area'] . ')' : '');
+			unset($city);
+		}
+		if($region == 1053480){
+			$_cities[1] = 'Москва';
+		}
+		$cache->set($country . 'cities', $_cities, 60*60*24*365);
+		$cities = $_cities;
 		return compact('cities');
 	}
 		

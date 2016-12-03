@@ -19,6 +19,7 @@ echo $form->field($GroupParser,'queries') ->textarea()
 	. $form->field($GroupParser,'country')->dropDownlist($GroupParser->countries,['data-x-country'=>1, 'prompt'=>'Выберите страну']) 
 	. $form->field($GroupParser,'region')->dropDownlist([],['data-x-region'=>1, 'prompt'=>'','disabled'=>true])
 	. $form->field($GroupParser,'city')->dropDownlist([],['data-x-city'=>1, 'prompt'=>'','disabled'=>true])
+	. $form->field($GroupParser,'m_city')->dropDownlist([],['data-x-m-city'=>1, 'prompt'=>'','disabled'=>true])
 	. $form->field($GroupParser,'closed')->checkbox()
 	. '<div class=form-group >' . Html::submitButton('Собрать', ['class'=>'btn btn-success']) . '</div>';
 
@@ -38,9 +39,10 @@ ob_start();
 $form = ActiveForm::begin(['action'=>['site/people-from-search-parser']]);
 echo $form->field($PeopleSearch,'queries') ->textarea()
 	. $form->field($PeopleSearch,'country')->dropDownlist(\app\models\parser\GroupParser::getCountries(),
-	  ['data-live-search'=>"true", 'class'=>'selectpicker','data-x-country'=>1, 'prompt'=>'Выберите страну']) 
+	  ['data-x-country'=>1, 'prompt'=>'Выберите страну']) 
 	. $form->field($PeopleSearch,'region')->dropDownlist([],['data-x-region'=>1, 'prompt'=>'','disabled'=>true])
 	. $form->field($PeopleSearch,'city')->dropDownlist([],['data-x-city'=>1, 'prompt'=>'','disabled'=>true])
+	. $form->field($PeopleSearch,'m_city')->dropDownlist([],['data-x-m-city'=>1, 'prompt'=>'','disabled'=>true])
 	. $form->field($PeopleSearch,'age_from')->textInput(['type'=>'number'])
 	. $form->field($PeopleSearch,'age_to')->textInput(['type'=>'number'])
 	. $form->field($PeopleSearch,'sex')->dropDownlist(['0'=>'Любой','2'=>'Мужской','1'=>'Женский'])
@@ -158,18 +160,32 @@ $css = ".fix-height>div{
 $this->registerCss($css);
 $js = "
 var city_cont = $('[data-x-city]');
+var m_city_cont = $('[data-x-m-city]');
 var region_cont = $('[data-x-region]');
+var country_cont = $('[data-x-country]');
 var country_cont = $('[data-x-country]');
 country_cont.change(function(){
 	var country = this.value;
 	var regions;
 	var url = '".yii::$app->urlManager->createUrl(['site/get-regions'])."';
+	var url_m = '".yii::$app->urlManager->createUrl(['site/get-main-cities'])."';
 	country_cont.val(country);
 	region_cont.attr('disabled', true).html('');
 	city_cont.attr('disabled', true).html('');
+	m_city_cont.attr('disabled', true).html('');
 	if(!country){
 		return ;
 	}
+	$.get(url_m+'?country='+country, function(response){
+		var opt = '',
+			src = response.main_cities,
+		  into = m_city_cont;
+		for(var i in src){
+			opt += '<option value=\"'+i+'\">'+src[i]+'</option>';
+		};
+		$(opt).appendTo(into);
+		into.attr('disabled', false);
+	});
 	$.get(url+'?country='+country, function(response){
 		var opt = '',
 			src = null,

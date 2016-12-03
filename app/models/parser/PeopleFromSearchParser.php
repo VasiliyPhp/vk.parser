@@ -16,6 +16,7 @@ class PeopleFromSearchParser extends Model
     public $country;
     public $region;
     public $city;
+    public $m_city;
     public $age_from;
     public $age_to;
     public $open_mess;
@@ -28,7 +29,7 @@ class PeopleFromSearchParser extends Model
     {
         return [
             [['queries'], 'required', 'message'=>'Обязательно'],
-						[['sex', 'region', 'country', 'city', 'age_from', 'age_to', 'open_mess', 'open_wall'], 'safe'],
+						[['sex', 'region', 'm_city','country', 'city', 'age_from', 'age_to', 'open_mess', 'open_wall'], 'safe'],
         ];
     }
 	
@@ -45,6 +46,7 @@ class PeopleFromSearchParser extends Model
             'age_to' => 'Возраст до',
             'sex' => 'Пол',
             'city' => 'Город',
+            'm_city' => 'Основные города',
             'region' => 'Регион',
             'country' => 'Страна',
         ];

@@ -33,7 +33,7 @@ class PeopleFromSearchParser extends yii\base\Action{
 				'sex'=>$PeopleSearch->sex,
 				'age_from'=>$PeopleSearch->age_from,
 				'age_to'=>$PeopleSearch->age_to,
-				'city'=>$PeopleSearch->city,
+				'city'=>$PeopleSearch->m_city? : $PeopleSearch->city,
 				'country'=>$PeopleSearch->country,
 				'sex'=>$PeopleSearch->sex,
 				'count'=>1000,

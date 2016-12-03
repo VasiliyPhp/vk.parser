@@ -15,7 +15,7 @@ class GroupParser extends yii\base\Action{
 			$token = yii::$app->user->identity->vk_access_token;
 			$VK = new VK(yii::$app->params['vk_standalone_app_id'], yii::$app->params['vk_standalone_secret_key'], $token);
 			$params = json_encode([
-			  'city_id'=>$GroupParser->city,
+			  'city_id'=>$GroupParser->m_city? : $GroupParser->city,
 			  'country_id'=>$GroupParser->country,
 			  'count'=>600
 			]);

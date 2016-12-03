@@ -78,6 +78,9 @@ class SiteController extends Controller
             'get-cities' => [
                 'class' => '\app\actions\parser\GetCities',
             ],
+            'get-main-cities' => [
+                'class' => '\app\actions\parser\GetMainCities',
+            ],
             'get-regions' => [
                 'class' => '\app\actions\parser\GetRegions',
             ],

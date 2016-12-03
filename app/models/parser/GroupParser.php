@@ -15,6 +15,7 @@ class GroupParser extends Model
     public $region;
     public $country;
     public $city;
+    public $m_city;
     public $closed;
 	  static $max_queries = 25;
 		static $is_closed;
@@ -25,7 +26,7 @@ class GroupParser extends Model
     {
         return [
             [['queries'], 'required', 'message'=>'Обязательно'],
-			[['country', 'city', 'closed'], 'safe'],
+			[['country', 'm_city', 'city', 'closed'], 'safe'],
 			['queries', 'queriesValidator', 'params'=>self::$max_queries],
         ];
     }
@@ -41,6 +42,8 @@ class GroupParser extends Model
 	public static function getRegions($country){
 		$cache = yii::$app->cache;
 		$regions = null;
+		/**/
+		// $cache->flush();
 		if( !($regions = $cache->get($country . 'regions'))){
 			$regions = [];
 			$token = yii::$app->user->identity->vk_access_token;
@@ -69,9 +72,32 @@ class GroupParser extends Model
 		return $countries;
 	}
 	
+	public static function getMainCities($country){
+		$cache = yii::$app->cache;
+		/**/
+		// $cache->flush();
+		if($cities = $cache->get($country . '-main_cities')){
+			return $cities;
+		}
+	  $cities = [];
+		$token = yii::$app->user->identity->vk_access_token;
+		$VK = new VK(yii::$app->params['vk_standalone_app_id'], yii::$app->params['vk_standalone_secret_key'], $token);
+		
+		$cities = $VK->api('database.getCities', [ 'country_id'=>$country, 'need_all'=>0,'count'=>1000])['response']['items'];
+		// j($cities);
+		for($i = 0; $i < count($cities); $i++){
+			$city = &$cities[$i];
+			$_cities[$city['id']] = $city['title'];
+			unset($city);
+		}
+		$cache->set($country . '-main_cities', $_cities, 60*60*24*365);
+		 $main_cities = $_cities;
+		 // j($main_cities);
+		return compact('main_cities');
+	}
+	
 	public static function getCities($country, $region = null){
 	  $cache = yii::$app->cache;
-		$cities = [];
 		/**/
 		// $cache->flush();
 		if($cities = $cache->get($country . '-' . $region . 'cities')){
@@ -88,10 +114,7 @@ class GroupParser extends Model
 			$_cities[$city['id']] = $city['title'] .(isset($city['area'])?   ' (' . $city['area'] . ')' : '');
 			unset($city);
 		}
-		if($region == 1053480){
-			$_cities[1] = 'Москва';
-		}
-		$cache->set($country . 'cities', $_cities, 60*60*24*365);
+		$cache->set($country . '-' . $region . 'cities', $_cities, 60*60*24*365);
 		$cities = $_cities;
 		return compact('cities');
 	}
@@ -105,6 +128,7 @@ class GroupParser extends Model
             'queries' => 'Список запросов. Каждый на новой строке',
             'country' => 'Страна',
             'region' => 'Регион',
+            'm_city' => 'Основные города',
             'city' => 'Город',
             'closed' => 'Закрытое',
         ];

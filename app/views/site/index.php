@@ -61,6 +61,11 @@ echo $form->field($PeopleInfo,'peoples')->textarea()
 	 $form4 = ob_get_contents();
 ob_end_clean();
 ?>
+<div class='col-md-12 col-lg-12'>
+  <a class='btn btn-success' href='#' id='clear-cache'>Очистить кэш</a>
+	<br/>
+</div>
+
   	<div class="col-lg-8 col-md-10">
 			<?=  Tabs::widget([
 				  'items'=>[
@@ -231,6 +236,16 @@ region_cont.change(function(){
 	});
 	
 })
+$('#clear-cache').click(function(ev){
+	ev.preventDefault();
+	ev.stopPropagation();
+	var url = '".yii::$app->urlManager->createUrl(['site/clear-cache'])."';
+	var \$this = $(this);
+	\$this.attr('disabled',true);
+	$.get(url, function(){
+		\$this.attr('disabled',false);
+	});
+});
 $('.x-gr-cp').click(function(ev){
 	var copied = $('.x-gr-res tbody');
 	ev.preventDefault();

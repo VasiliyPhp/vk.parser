@@ -78,6 +78,9 @@ class SiteController extends Controller
             'get-cities' => [
                 'class' => '\app\actions\parser\GetCities',
             ],
+            'clear-cache' => [
+                'class' => '\app\actions\parser\ClearCache',
+            ],
             'get-main-cities' => [
                 'class' => '\app\actions\parser\GetMainCities',
             ],

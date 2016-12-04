@@ -11,15 +11,15 @@ $this->title = 'Вк парсер';
 ?>
 <h1><?=$this->title?></h1>
 <div class="site-index">
-  <div class=row>
+<div class=row>
 <?php 
 ob_start();
 $form = ActiveForm::begin(['action'=>['site/group-parser']]);
 echo $form->field($GroupParser,'queries') ->textarea()
 	. $form->field($GroupParser,'country')->dropDownlist($GroupParser->countries,['data-x-country'=>1, 'prompt'=>'Выберите страну']) 
-	. $form->field($GroupParser,'region')->dropDownlist([],['data-x-region'=>1, 'prompt'=>'','disabled'=>true])
-	. $form->field($GroupParser,'city')->dropDownlist([],['data-x-city'=>1, 'prompt'=>'','disabled'=>true])
-	. $form->field($GroupParser,'m_city')->dropDownlist([],['data-x-m-city'=>1, 'prompt'=>'','disabled'=>true])
+	. $form->field($GroupParser,'region')->dropDownlist([],['data-x-region'=>1, 'prompt'=>'','disabled'=>1])
+	. $form->field($GroupParser,'city')->dropDownlist([],['data-x-city'=>1, 'prompt'=>'','disabled'=>1])
+	. $form->field($GroupParser,'m_city')->dropDownlist([],['data-x-m-city'=>1, 'prompt'=>'','disabled'=>1])
 	. $form->field($GroupParser,'closed')->checkbox()
 	. '<div class=form-group >' . Html::submitButton('Собрать', ['class'=>'btn btn-success']) . '</div>';
 
@@ -61,12 +61,12 @@ echo $form->field($PeopleInfo,'peoples')->textarea()
 	 $form4 = ob_get_contents();
 ob_end_clean();
 ?>
-<div class='col-md-12 col-lg-12'>
-  <a class='btn btn-success' href='#' id='clear-cache'>Очистить кэш</a>
-	<br/>
-</div>
-
-  	<div class="col-lg-8 col-md-10">
+		<div class="col-lg-8 col-md-10">
+  	<?php if(YII_DEBUG){?>
+			<div class='form-group'>
+				<a class='btn btn-success' href='#' id='clear-cache'>Очистить кэш</a>
+			</div>
+		<?php } ?>
 			<?=  Tabs::widget([
 				  'items'=>[
 					  [
@@ -168,7 +168,8 @@ var city_cont = $('[data-x-city]');
 var m_city_cont = $('[data-x-m-city]');
 var region_cont = $('[data-x-region]');
 var country_cont = $('[data-x-country]');
-var country_cont = $('[data-x-country]');
+country_cont.unbind('change');
+region_cont.unbind('change');
 country_cont.change(function(){
 	var country = this.value;
 	var regions;

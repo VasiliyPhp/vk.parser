@@ -50,9 +50,10 @@ class GroupParser extends Model
 			$VK = new VK(yii::$app->params['vk_standalone_app_id'], yii::$app->params['vk_standalone_secret_key'], $token);
 			$VK->bulkApi('database.getRegions', ['country_id'=>$country,'need_all'=>1,'count'=>1000], $regions);
 			$regions = array_column($regions, 'title', 'id');
+		  $regions = compact('regions');
 			$cache->set($country . 'regions', $regions, 60*60*24*365);
 		}
-		return $regions ? compact('regions') : ['cities'=>self::getCities($country)['cities'] ];
+		return $regions['regions'] ? $regions : self::getCities($country);
 	}
 	
 	public static function getCountries(){
@@ -90,10 +91,10 @@ class GroupParser extends Model
 			$_cities[$city['id']] = $city['title'];
 			unset($city);
 		}
-		$cache->set($country . '-main_cities', $_cities, 60*60*24*365);
-		 $main_cities = $_cities;
-		 // j($main_cities);
-		return compact('main_cities');
+		$main_cities = $_cities;
+		$main_cities = compact('main_cities');
+		$cache->set($country . '-main_cities', $main_cities, 60*60*24*365);
+		return $main_cities;
 	}
 	
 	public static function getCities($country, $region = null){
@@ -101,6 +102,7 @@ class GroupParser extends Model
 		/**/
 		// $cache->flush();
 		if($cities = $cache->get($country . '-' . $region . 'cities')){
+			die;
 			return $cities;
 		}
 		$cities = [];
@@ -114,9 +116,10 @@ class GroupParser extends Model
 			$_cities[$city['id']] = $city['title'] .(isset($city['area'])?   ' (' . $city['area'] . ')' : '');
 			unset($city);
 		}
-		$cache->set($country . '-' . $region . 'cities', $_cities, 60*60*24*365);
 		$cities = $_cities;
-		return compact('cities');
+		$cities = compact('cities');
+		$cache->set($country . '-' . $region . 'cities', $cities, 60*60*24*365);
+		return $cities;
 	}
 		
     /**
